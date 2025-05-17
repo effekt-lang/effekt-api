@@ -100,7 +100,6 @@ const dumpDefinitions = (ctx) => (term) => {
 const dumpDefinition = (ctx) => (term) => {
   ctx.heading(ctx.depth, term.kind, ctx.id(term.id), showSignature(ctx)(term));
   dumpDoc(ctx)(term.doc);
-  // dumpSignature(ctx)(term);
   dumpDefinitions(ctx)(term);
   dumpFields(ctx)(term);
 };
@@ -108,10 +107,15 @@ const dumpDefinition = (ctx) => (term) => {
 const dumpModule = (ctx) => (obj) => {
   console.assert(obj.module.kind === "ModuleDecl");
   ctx.heading(ctx.depth, "Module", obj.module.path);
-  ctx.write(`Jump to source: `);
+  ctx.write("Jump to source: ");
   ctx.url(
     obj.source,
     `https://github.com/effekt-lang/effekt/tree/master/${obj.source}`,
+  );
+  ctx.write("<br>Example usage: ");
+  ctx.url(
+    `examples/stdlib/${obj.module.path}`,
+    `https://github.com/effekt-lang/effekt/tree/master/examples/stdlib/${obj.module.path}`,
   );
   dumpDoc(ctx)(obj.module.doc); // TODO
   obj.module.defs.forEach(dumpDefinition({ ...ctx, depth: ctx.depth + 1 }));
@@ -161,9 +165,9 @@ const htmlTemplate = (toc) => ({
       <li class="header">
         <div class="brand">
           <img src="https://effekt-lang.org/img/light-navbar-brand.svg" alt="Effekt Logo" />
-          <span>Effekt Language</span>
+          <span>Effekt Library</span>
         </div>
-        <input class="search" type="text" placeholder="Search" id="search"></input>
+        <input class="search" type="search" spellcheck=false placeholder="Search" id="search"></input>
       </li>
       ${toc}
       <li class="searchResults"></li>
@@ -188,15 +192,9 @@ const htmlWriter = (write) => {
   return {
     write,
     heading: (depth, kind, text, signature) => {
-      // let out = "";
-      // if (depth < currentDepth) out += "</section>";
-      // out += `<h${depth} class="heading ${kind}" title="${kind}">${text} <small class="signature">${htmlify(signature)}</small></h${depth}>`;
-      // if (depth > currentDepth) out += "<section class=box>";
-      // currentDepth = depth;
-      // write(out);
       let out = "";
       if (depth > currentDepth) out += "<ul class=subtree>";
-      if (depth < currentDepth) out += "</ul>";
+      if (depth < currentDepth) out += "</ul>".repeat(currentDepth - depth);
       currentDepth = depth;
       out += `<li class="heading ${kind}" title="${kind}">${text} <small class="signature">${htmlify(signature)}</small></li>`;
       write(out);
@@ -232,7 +230,7 @@ const htmlTocWriter = (write) => {
     heading: (depth, kind, text) => {
       let out = "";
       if (depth > currentDepth) out += "<ul class=subtree>";
-      if (depth < currentDepth) out += "</ul>";
+      if (depth < currentDepth) out += "</ul>".repeat(currentDepth - depth);
       currentDepth = depth;
       out += `<li class="heading ${kind}">${text}</li>`;
       write(out);

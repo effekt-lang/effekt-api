@@ -66,31 +66,55 @@ function findModule(definition) {
   return it;
 }
 
+// TODO: we could instead also just parse the originSource attribute (see jumpToGithubOrigin)
 function jumpToOrigin(definition) {
   const mod = findModule(definition);
   const { lineStart, columnStart, lineEnd, columnEnd } =
     definition.obj.id.origin;
   const name = `${definition.obj.id.name}@${lineStart}:${columnStart}-${lineEnd}:${columnEnd}`;
   const url = `${mod.obj.path}.html#${name}`;
-  // window.location.href = url;
   window.location.assign(url);
   scrollToUri(name);
 }
 
-function jumpToSource(el) {
+function jumpToGithubOrigin(el) {
+  const originSource = el.getAttribute("data-originSource");
+  const origin = el.getAttribute("data-origin");
+  if (!origin) {
+    warn("No origin!");
+    return;
+  }
+  const { lineStart, lineEnd } = deconstructPosId(origin);
+  const url = `https://github.com/effekt-lang/effekt/blob/master/${originSource}#L${lineStart}-L${lineEnd}`;
+  window.location.href = url;
+}
+
+function jumpToGithubSource(el) {
   const sourceSource = el.getAttribute("data-sourceSource");
   const source = el.getAttribute("data-source");
+  if (!source) {
+    warn("No source!");
+    return;
+  }
   const { lineStart, lineEnd } = deconstructPosId(source);
   const url = `https://github.com/effekt-lang/effekt/blob/master/${sourceSource}#L${lineStart}-L${lineEnd}`;
+  window.location.href = url;
+}
+
+function findGithubUses(text) {
+  const url = `https://github.com/search?type=code&q=path%3A**%2F*.effekt+%22${text}%22`;
   window.location.href = url;
 }
 
 function scrollToUri(uri) {
   if (uri.length === 0) return;
 
+  // nodes with this exact origin URI are not necessarily the definitions, but could also be uses!
+  // therefore we jump to the first term with this origin that's a direct descendant of a heading
+  // (i.e. not a simple usage, but a definition)
   const [name, id] = uri.split("@");
   const element = document.querySelector(
-    `.view .heading .id[data-origin="${id}"]`,
+    `.view .heading > .id[data-origin="${id}"]`,
   );
   if (!element) return;
 
@@ -127,55 +151,142 @@ function unhighlightAll() {
     .forEach((el) => el.classList.remove("highlight"));
 }
 
-function generateDefinitionItem({
-  obj: {
-    kind,
-    id: { name, source, origin },
-  },
-}) {
-  return `<li class="heading ${kind}">
-           <span class="id" data-sourcesource="${source.file}" data-source="${constructPosId(source)}" data-originsource="${origin.file}" data-origin="${constructPosId(origin)}">
-             ${name}
-           </span>
-         </li>`;
+function generateDefinitionItem(definition) {
+  const defId = definition.obj.id;
+  return `
+    <li class="heading ${definition.obj.kind}">
+      <span class="id" data-sourcesource="${defId.source.file}" data-source="${constructPosId(defId.source)}" data-originsource="${defId.origin.file}" data-origin="${constructPosId(defId.origin)}">
+        ${defId.name}
+      </span>
+    </li>`;
 }
 
 function searchDefinition(input) {
-  /// search in current module
-
-  // hide current toc
   const toc = document.querySelector(".toc.tree");
   const child = toc.querySelector(".subtree");
-  child.style.display = "none";
 
   // remove previous search results
   toc.querySelectorAll(".searchResults *").forEach((el) => el.remove());
 
+  if (input == "") {
+    child.style.display = "inherit";
+    return;
+  }
+
+  // hide current toc
+  child.style.display = "none";
+
   // search by name
+  // TODO: do we only want to search by isDefinition? We could also include args, types, etc.
   const results = searchLibrary(
     ({ id, kind }) =>
-      id.name && id.name.startsWith(input) && isDefinition(kind),
+      id.name && id.name.toLowerCase().startsWith(input) && isDefinition(kind),
   );
-  // TODO: filter by breadcrumb path
 
-  console.log(results);
-  const resultHTML = results.map(generateDefinitionItem).join("");
+  // group results by module
+  const modules = {};
+  results.forEach((result) => {
+    const module = findModule(result);
+    if (module.obj.path in modules)
+      modules[module.obj.path].results.push(result);
+    else modules[module.obj.path] = { module, results: [result] };
+  });
+
+  // concatenate html of all modules with the concatenated definitions
+  const moduleHTML = Object.entries(modules)
+    .map(([path, value]) => {
+      const resultHTML = value.results.map(generateDefinitionItem).join("");
+      const mod = value.module.obj;
+      return `
+      <li class="heading Module">
+        <span class="id" data-sourcesource="${mod.span.file}" data-source="${constructPosId(mod.span)}" data-originsource="${mod.span.file}" data-origin="${constructPosId(mod.span)}">
+          ${mod.path}
+        </span>
+        <ul class="subtree">
+          ${resultHTML}
+        </ul>
+      </li>`;
+    })
+    .join("");
 
   toc.querySelector(".searchResults").innerHTML =
-    `<ul class="subtree">${resultHTML}</ul>`;
-  registerIdentifierListeners(toc);
+    `<ul class="subtree">${moduleHTML}</ul>`;
+  initializeHovering(toc);
+  initializeTOC();
 }
 
-function registerIdentifierListeners(dom) {
+function clearPopups() {
+  document.querySelectorAll(".popup").forEach((el) => el.remove());
+}
+
+function showPopupAt(ev, entries) {
+  clearPopups();
+
+  const ul = document.createElement("ul");
+  entries.forEach(({ content, callback }) => {
+    const li = document.createElement("li");
+    li.innerHTML = content;
+    li.addEventListener("click", (ev) => (clearPopups(), callback(ev)), {
+      once: true,
+    });
+    ul.appendChild(li);
+  });
+
+  const popup = document.createElement("div");
+  popup.className = "popup";
+  const content = document.createElement("div");
+  popup.style.left = ev.pageX + "px";
+  popup.style.top = ev.pageY + "px";
+  popup.style.cursor = "pointer";
+  popup.appendChild(ul);
+  document.body.appendChild(popup);
+}
+
+function findOrigins(origin, name) {
+  const results = searchLibrary(
+    ({ id, kind }) =>
+      id.name === name && isDefinition(kind) && equalOrigin(id, origin),
+  );
+  return results;
+}
+
+function lookupPopupAt(ev, element) {
+  showPopupAt(ev, [
+    {
+      content: "Jump to origin (docs)",
+      callback: () => {
+        const origins = findOrigins(
+          element.getAttribute("data-origin"),
+          element.innerText,
+        );
+        if (origins.length === 0) warn("Couldn't find definition!");
+        else jumpToOrigin(origins[0]);
+      },
+    },
+    {
+      content: "Jump to origin (GitHub)",
+      callback: () => jumpToGithubOrigin(element),
+    },
+    {
+      content: "Jump to source (GitHub)",
+      callback: () => jumpToGithubSource(element),
+    },
+    {
+      content: "Find uses (GitHub)",
+      callback: () => findGithubUses(element.innerText),
+    },
+  ]);
+}
+
+function initializeHovering(dom) {
   dom.querySelectorAll("span.id").forEach((el1) => {
     const origin = el1.getAttribute("data-origin");
 
-    // interconnected listeners for hovering
-    // TODO: we should also compare by name, e.g. in Exception
+    // interconnected listeners
     el1.addEventListener("mouseenter", () => {
-      if (origin == "") return;
       unhighlightAll();
       el1.classList.add("highlight");
+      if (origin == "") return;
       dom
         .querySelectorAll(`span.id[data-origin="${origin}"]`)
         .forEach((el2) => {
@@ -183,33 +294,37 @@ function registerIdentifierListeners(dom) {
         });
     });
     el1.addEventListener("mouseout", () => {
-      if (origin == "") return;
       el1.classList.remove("highlight");
+      if (origin == "") return;
       dom
         .querySelectorAll(`span.id[data-origin="${origin}"]`)
         .forEach((el2) => {
           el2.classList.remove("highlight");
         });
     });
+  });
+}
 
-    // click
-    el1.addEventListener("click", async () => {
-      const results = searchLibrary(
-        ({ id, kind }) =>
-          id.name === el1.innerText &&
-          isDefinition(kind) &&
-          equalOrigin(id, origin),
-      );
+function warn(text) {
+  console.warn(text);
+  document.body.style.cursor = "not-allowed";
+  setTimeout(() => (document.body.style.cursor = "auto"), 1000);
+}
 
-      if (results.length > 1) console.warn("Found multiple definitions!");
-      if (results.length === 0) console.warn("Couldn't find definition!");
-      if (results.length === 1) jumpToOrigin(results[0]);
+function initializeView() {
+  document.querySelectorAll(".view.tree span.id").forEach((el) => {
+    el.addEventListener("click", async (ev) => {
+      lookupPopupAt(ev, el);
     });
+  });
+}
 
-    // right click
-    el1.addEventListener("contextmenu", async (ev) => {
-      ev.preventDefault();
-      jumpToSource(el1);
+function initializeTOC() {
+  document.querySelectorAll(".toc.tree span.id").forEach((el) => {
+    el.addEventListener("click", () => {
+      const origins = findOrigins(el.getAttribute("data-origin"), el.innerText);
+      if (origins.length === 0) warn("Couldn't find definition!");
+      else jumpToOrigin(origins[0]);
     });
   });
 }
@@ -232,7 +347,13 @@ document.querySelectorAll("div.markdownWrap").forEach((el) => {
   el.innerHTML = marked.parse(inner.textContent);
 });
 
-registerIdentifierListeners(document);
+document.body.addEventListener("click", clearPopups, true);
+
+initializeHovering(document);
+initializeTOC();
+initializeView();
 
 const searchBar = document.querySelector("input#search");
-searchBar.addEventListener("input", () => searchDefinition(searchBar.value));
+searchBar.addEventListener("input", () =>
+  searchDefinition(searchBar.value.toLowerCase()),
+);

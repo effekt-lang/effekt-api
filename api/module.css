@@ -38,7 +38,7 @@ main {
 
 .toc.tree {
   border-right: 3px solid #ddd;
-  min-width: 200px;
+  width: 200px;
 }
 
 .toc .subtree {
@@ -61,6 +61,7 @@ main {
 .tree li {
   list-style-type: none;
   margin: 8px 0;
+  white-space: nowrap;
 }
 
 .tree li a {
@@ -100,7 +101,7 @@ main {
   display: block;
   padding: 8px;
   border-radius: 10px;
-  width: calc(100% - 16px - 4px);
+  width: 100%;
   margin: 0 auto;
 }
 
@@ -123,9 +124,19 @@ main {
 
 /* --- jumpTo popup box --- */
 
-.jumpTo {
-  position: absolute;
-  border: 1px solid black;
+.popup {
+	position: absolute;
+	display: block;
+	background-color: white;
+	padding: 8px;
+	max-width: 300px;
+  border: 3px solid #ddd;
+  border-radius: 10px;
+}
+
+.popup ul {
+  padding-left: 12px;
+  margin: 0;
 }
 
 /* --- responsiveness --- */
