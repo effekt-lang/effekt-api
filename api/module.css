@@ -1,0 +1,232 @@
+html, body, main {
+  padding: 0;
+  margin: 0;
+  font-family: "Open Sans", sans-serif;
+  width: 100vw;
+  height: 100vh;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+main {
+  display: grid;
+  grid-template-columns: auto 1fr;
+}
+
+/* prevents constant title hovering */
+.heading {
+  width: fit-content;
+}
+
+.view {
+  width: calc(100% - 32px);
+  min-height: 100%;
+  overflow-y: auto;
+  padding:  16px;
+  margin: 0;
+}
+
+/* --- tree --- */
+
+.tree {
+  min-height: 100%;
+  overflow-y: scroll;
+  list-style-type: none;
+  padding: 0 16px;
+  margin: 0;
+}
+
+.toc.tree {
+  border-right: 3px solid #ddd;
+  min-width: 200px;
+}
+
+.toc .subtree {
+  padding-inline-start: 1em;
+}
+
+.view .subtree {
+  padding-inline-start: 0em;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* for all subtrees within module */
+.view .subtree > .subtree > .subtree {
+  border-left: 3px solid #ddd;
+  margin-left: .6em;
+  padding-left: .5em;
+}
+
+.tree li {
+  list-style-type: none;
+  margin: 8px 0;
+}
+
+.tree li a {
+  text-decoration: none;
+  color: black;
+}
+
+.tree li.header {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background-color: white;
+  margin: 0;
+}
+
+/* --- logo --- */
+
+.tree li.header .brand {
+  display: flex;
+  padding: 16px 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.tree li.header .brand span {
+  font-weight: 500;
+  font-size: 18px;
+}
+
+.tree li.header .brand img {
+  display: block;
+  width: 36px;
+  height: 36px;
+}
+
+.tree li.header input.search {
+  display: block;
+  padding: 8px;
+  border-radius: 10px;
+  width: calc(100% - 16px - 4px);
+  margin: 0 auto;
+}
+
+/* --- markdown --- */
+
+.markdownWrap {
+  max-width: 100%;
+  border-left: 3px solid #ddd;
+  margin-left: .6em;
+  padding-left: .5em;
+}
+
+.markdownWrap p {
+  margin: 0;
+}
+
+.signature {
+  color: #424242;
+}
+
+/* --- jumpTo popup box --- */
+
+.jumpTo {
+  position: absolute;
+  border: 1px solid black;
+}
+
+/* --- responsiveness --- */
+
+@media only screen and (max-width: 600px) {
+  .toc {
+    display: none;
+  }
+}
+
+/* --- definition token types --- */
+
+.heading::before {
+  border-radius: 100%;
+  width: 1em;
+  height: 1em;
+  font-size: .8em;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 .2em;
+  padding: .2em;
+}
+
+span.id.highlight {
+  background-color: #e6e6e6;
+  cursor: pointer;
+}
+
+.view .Module {
+  font-size: 2em;
+}
+.toc .Module::before {
+  content: "M";
+  color: white;
+  background-color: #542e5a;
+}
+.view .Module::before {
+  content: "Module: ";
+  display: unset;
+  width: unset;
+  font-size: unset;
+  margin: 0;
+  padding: 0;
+  background-color: white;
+}
+
+.DataDef::before {
+  content: "D";
+  color: white;
+  background-color: #36bc98;
+}
+.Constructor::before {
+  content: "C";
+  color: white;
+  background-color: #36bc98;
+}
+
+.InterfaceDef::before {
+  content: "I";
+  color: white;
+  background-color: #36bc98;
+}
+.Operation::before {
+  content: "O";
+  color: white;
+  background-color: #36bc98;
+}
+
+.RecordDef::before {
+  background-color: #36bc98;
+  color: white;
+  content: "R";
+}
+
+.ValDef::before {
+  content: "V";
+  color: white;
+  background-color: #f77d11;
+}
+
+.FunDef::before {
+  content: "F";
+  color: white;
+  background-color: #d73a49;
+}
+
+.NamespaceDef::before {
+  content: "N";
+  color: white;
+  background-color: green;
+}
+
+.ExternDef::before {
+  content: "E";
+  color: white;
+  background-color: #394A4B;
+}
+
+.ExternType::before {
+  content: "E";
+  color: white;
+  background-color: #394A4B;
+}
