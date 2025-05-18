@@ -66,6 +66,11 @@ function findModule(definition) {
   return it;
 }
 
+// some sources contain the path to the node-installed library, so we need to extract only the relevant path!
+function stripSource(source) {
+  return source.replace(/.*(libraries\/.*\.effekt)$/, "$1");
+}
+
 // TODO: we could instead also just parse the originSource attribute (see jumpToGithubOrigin)
 function jumpToOrigin(definition) {
   const mod = findModule(definition);
@@ -85,7 +90,7 @@ function jumpToGithubOrigin(el) {
     return;
   }
   const { lineStart, lineEnd } = deconstructPosId(origin);
-  const url = `https://github.com/effekt-lang/effekt/blob/master/${originSource}#L${lineStart}-L${lineEnd}`;
+  const url = `https://github.com/effekt-lang/effekt/blob/master/${stripSource(originSource)}#L${lineStart}-L${lineEnd}`;
   window.location.href = url;
 }
 
@@ -97,7 +102,7 @@ function jumpToGithubSource(el) {
     return;
   }
   const { lineStart, lineEnd } = deconstructPosId(source);
-  const url = `https://github.com/effekt-lang/effekt/blob/master/${sourceSource}#L${lineStart}-L${lineEnd}`;
+  const url = `https://github.com/effekt-lang/effekt/blob/master/${stripSource(sourceSource)}#L${lineStart}-L${lineEnd}`;
   window.location.href = url;
 }
 

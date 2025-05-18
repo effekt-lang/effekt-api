@@ -70,7 +70,6 @@ const dumpFields = (ctx) => (term) => {
         ctx.id(field.id),
         showSignature(ctx)(field),
       );
-      // dumpSignature(ctx)(field);
       dumpDoc(ctx)(field.doc);
     });
   };
