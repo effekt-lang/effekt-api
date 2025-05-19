@@ -2,13 +2,14 @@
 const stripSource = (source) =>
   source ? source.replace(/.*(libraries\/.*\.effekt)$/, "$1") : "";
 
+// TODO: the paths to the static files are wrong for nested effekt files
 const htmlTemplate = (toc) => ({
   start: `<!DOCTYPE html>
   <html>
   <meta>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="stylesheet" href="/module.css" type="text/css" charset="utf-8" />
+    <link rel="stylesheet" href="module.css" type="text/css" charset="utf-8" />
   </meta>
   <body>
     <main>
@@ -29,7 +30,7 @@ const htmlTemplate = (toc) => ({
     </ul>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="/module.js" type="module" charset="utf-8"></script>
+    <script src="module.js" type="module" charset="utf-8"></script>
   </body></html>`,
 });
 

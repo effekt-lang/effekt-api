@@ -20,10 +20,6 @@ main {
 
 .view {
   width: calc(100% - 32px);
-  min-height: 100%;
-  overflow-y: auto;
-  padding:  16px;
-  margin: 0;
 }
 
 /* --- tree --- */
@@ -228,6 +224,12 @@ span.id.highlight {
   content: "N";
   color: white;
   background-color: green;
+}
+
+.TypeDef::before {
+  content: "T";
+  color: white;
+  background-color: #0087c8;
 }
 
 .ExternDef::before {
