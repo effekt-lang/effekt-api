@@ -8,4 +8,4 @@ cat out/*.json | jq -c -s . >build/full.json
 gzip build/full.json
 
 cp static/* build/
-node convert.js html
+node convert.js "$1"

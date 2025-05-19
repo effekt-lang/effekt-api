@@ -16,6 +16,9 @@ const sanitizeDoc = (doc) => {
     .join("\n");
 };
 
+const stripSource = (source) =>
+  source.replace(/.*(libraries\/.*\.effekt)$/, "$1");
+
 const dumpDoc = (ctx) => (doc) => ctx.addDoc(sanitizeDoc(doc) ?? "");
 
 const showType = (ctx) => (t) => {
@@ -95,8 +98,8 @@ const dumpModule = (ctx) => (obj) => {
   ctx.heading(ctx.depth, "Module", obj.module.path);
   ctx.write("Jump to source: ");
   ctx.url(
-    obj.source,
-    `https://github.com/effekt-lang/effekt/tree/master/${obj.source}`,
+    stripSource(obj.source),
+    `https://github.com/effekt-lang/effekt/tree/master/${stripSource(obj.source)}`,
   );
   ctx.write("<br>Example usage: ");
   ctx.url(

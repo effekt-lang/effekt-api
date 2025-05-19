@@ -1,3 +1,7 @@
+// some sources contain the path to the node-installed library, so we need to extract only the relevant path!
+const stripSource = (source) =>
+  source ? source.replace(/.*(libraries\/.*\.effekt)$/, "$1") : "";
+
 const htmlTemplate = (toc) => ({
   start: `<!DOCTYPE html>
   <html>
@@ -63,7 +67,7 @@ const htmlWriter = (write) => {
         "lineStart" in origin
           ? `${origin.lineStart}:${origin.columnStart}-${origin.lineEnd}:${origin.columnEnd}`
           : "";
-      return `<span class="id" data-sourceSource="${source.file}" data-source="${sourceId}" data-originSource="${origin.file || ""}" data-origin="${originId}">${name}</span>`;
+      return `<span class="id" data-sourceSource="${stripSource(source.file)}" data-source="${sourceId}" data-originSource="${stripSource(origin.file)}" data-origin="${originId}">${name}</span>`;
     },
     depth: 1,
     currentDepth: () => currentDepth,
@@ -94,7 +98,7 @@ const htmlTocWriter = (write) => {
         "lineStart" in origin
           ? `${origin.lineStart}:${origin.columnStart}-${origin.lineEnd}:${origin.columnEnd}`
           : "";
-      return `<span class="id" data-sourceSource="${source.file}" data-source="${sourceId}" data-originSource="${origin.file || ""}" data-origin="${originId}">${name}</span>`;
+      return `<span class="id" data-sourceSource="${stripSource(source.file)}" data-source="${sourceId}" data-originSource="${stripSource(origin.file) || ""}" data-origin="${originId}">${name}</span>`;
     },
     depth: 1,
     currentDepth: () => currentDepth,
