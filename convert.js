@@ -56,7 +56,7 @@ const showSignature = (ctx) => (term) => {
     res += ` \`(${term.vparams.map(({ id, tpe }) => `${ctx.id(id)}: ${showType(ctx)(tpe)}`).join(", ")})\``;
 
   if ("bparams" in term && term.bparams.length > 0)
-    res += ` ${term.bparams.map(({ id, tpe }) => `\`{ ${ctx.id(id)}: ${showType(ctx)(tpe)} }\``).join(", ")}`;
+    res += ` ${term.bparams.map(({ id, tpe }) => `\`{ ${ctx.id(id)}: ${showType(ctx)(tpe)} }\``).join(" ")}`;
 
   if ("ret" in term && term.ret.kind === "Effectful")
     res += `: \`${showType(ctx)(term.ret.tpe)} / {${term.ret.eff.map(showType(ctx)).join(", ")}}\` `;
