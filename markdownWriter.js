@@ -21,10 +21,7 @@ const markdownWriter = (write) => ({
   heading: (depth, kind, text) =>
     write(`${"#".repeat(depth)} ${text} (${kind})\n`),
   url: (name, href) => write(`[${name}](${href})`),
-  addPoint: (text) => write(`- ${text}\n`),
   addDoc: (doc) => write(`${doc}\n`),
-  startList: () => write("\n"),
-  endList: () => write("\n"),
   id: (id) => id.name,
   depth: 1,
 });

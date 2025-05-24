@@ -53,15 +53,12 @@ const htmlWriter = (write) => {
       write(out);
     },
     url: (name, href) => write(`<a href="${href}">${name}</a>`),
-    addPoint: (text) => write(`<li>${htmlify(text)}\n</li>`),
     addDoc: (doc) => {
       if (doc.trim() != "")
         write(
           `<div class="markdownWrap"><pre class="markdown doc">${doc}</pre></div>`,
         );
     },
-    startList: () => write("<ul>"),
-    endList: () => write("</ul>"),
     id: ({ name, source, origin }) => {
       const sourceId = `${source.lineStart}:${source.columnStart}-${source.lineEnd}:${source.columnEnd}`;
       // not every id has an origin!
@@ -89,10 +86,7 @@ const htmlTocWriter = (write) => {
       write(out);
     },
     url: () => {},
-    addPoint: () => {},
     addDoc: () => {},
-    startList: () => {},
-    endList: () => {},
     id: ({ name, source, origin }) => {
       const sourceId = `${source.lineStart}:${source.columnStart}-${source.lineEnd}:${source.columnEnd}`;
       // not every id has an origin!
@@ -143,8 +137,8 @@ export const htmlDumpMultipleDispatch = (write, dumpModule) => {
     }
 
     // reset writer state
-    tocWriter.depth = -1;
-    writer.depth = -1;
+    tocWriter.depth = 1;
+    writer.depth = 1;
 
     dumpModule(tocWriter)(docs);
     dumpModule(writer)(docs);
