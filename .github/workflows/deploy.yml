@@ -1,0 +1,63 @@
+name: Deploy to pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      effekt_commit:
+        description: "Commit SHA of Effekt submodule to checkout and build. If omitted, the latest commit is chosen. (OPTIONAL)"
+        required: false
+  schedule:
+    - cron: '0 0 * * 2'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Effekt dependencies
+        uses: effekt-lang/effekt/.github/actions/setup-effekt
+        with:
+          install-dependencies: 'true'
+      - name: Checkout given commit
+        if: "${{ github.event.inputs.effekt_commit != '' }}"
+        run: |
+          git -C effekt/ checkout ${{ github.event.inputs.effekt_commit }}
+      - name: Checkout most recent commit
+        if: "${{ github.event.inputs.effekt_commit == '' }}"
+        run: |
+          git -C effekt/ checkout master
+          git -C effekt/ pull
+      - name: Install Effekt
+        run: cd effekt/ && sbt install
+      - name: Generate documentation
+        run: ./gen.sh html
+      - name: Set up pages
+        id: pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
