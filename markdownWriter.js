@@ -29,11 +29,9 @@ const markdownWriter = (write) => ({
   depth: 1,
 });
 
-const markdownDump = (write, dumpModule) => (docs) => {
+export const markdownDump = (write, dumpModule) => (docs) => {
   const writer = markdownWriter(write);
   writer.write(markdownTemplate.start);
   dumpModule(writer)(docs);
   writer.write(markdownTemplate.end);
 };
-
-module.exports = { markdownDump };

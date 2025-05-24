@@ -157,7 +157,7 @@ main {
   padding: .2em;
 }
 
-span.id.highlight {
+span.id.highlight, .heading.highlight {
   background-color: #e6e6e6;
   cursor: pointer;
 }
@@ -172,6 +172,7 @@ span.id.highlight {
 }
 .view .Module::before {
   content: "Module: ";
+  border-radius: unset;
   display: unset;
   width: unset;
   font-size: unset;

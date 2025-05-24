@@ -43,7 +43,8 @@ const htmlWriter = (write) => {
   let currentDepth = -1;
   return {
     write,
-    heading: (depth, kind, text, signature) => {
+    heading: (depth, kind, text, signature, onlyToc) => {
+      if (onlyToc) return;
       let out = "";
       if (depth > currentDepth) out += "<ul class=subtree>";
       if (depth < currentDepth) out += "</ul>".repeat(currentDepth - depth);
@@ -106,7 +107,7 @@ const htmlTocWriter = (write) => {
   };
 };
 
-const htmlDump = (write, dumpModule) => (docs) => {
+export const htmlDump = (write, dumpModule) => (docs) => {
   let toc = "";
   const tocWriter = htmlTocWriter((text) => (toc += text));
   dumpModule(tocWriter)(docs);
@@ -122,4 +123,34 @@ const htmlDump = (write, dumpModule) => (docs) => {
   write(content);
 };
 
-module.exports = { htmlDump };
+// allows dumping multiple docs objs into a single template
+export const htmlDumpMultipleDispatch = (write, dumpModule) => {
+  let toc = "";
+  let content = "";
+  const tocWriter = htmlTocWriter((text) => (toc += text));
+  const writer = htmlWriter((text) => (content += text));
+
+  const dispatch = (docs) => {
+    // false value -> write!
+    if (!docs) {
+      toc += "</ul>".repeat(Math.max(tocWriter.currentDepth(), 0));
+      const template = htmlTemplate(toc);
+      write(template.start);
+      write(content);
+      write("</section>".repeat(Math.max(writer.currentDepth(), 0)));
+      write(template.end);
+      return;
+    }
+
+    // reset writer state
+    tocWriter.depth = -1;
+    writer.depth = -1;
+
+    dumpModule(tocWriter)(docs);
+    dumpModule(writer)(docs);
+
+    return dispatch;
+  };
+
+  return dispatch;
+};

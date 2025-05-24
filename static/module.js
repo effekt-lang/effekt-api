@@ -8,6 +8,10 @@ import {
   loadLibrary,
 } from "./search.js";
 
+function jumpToModule(module) {
+  window.location.assign(`/${module}.html`);
+}
+
 // TODO: we could instead also just parse the originSource attribute (see jumpToGithubOrigin)
 function jumpToOrigin(definition, newTab) {
   const mod = findModule(definition);
@@ -101,6 +105,14 @@ function lookupPopupAt(ev, element) {
   ]);
 }
 
+function initializeModules() {
+  document.querySelectorAll(".heading.Module").forEach((el) => {
+    el.addEventListener("click", async (ev) => jumpToModule(el.innerText));
+    el.addEventListener("mouseenter", () => el.classList.add("highlight"));
+    el.addEventListener("mouseout", () => el.classList.remove("highlight"));
+  });
+}
+
 function initializeHovering(dom) {
   dom.querySelectorAll("span.id").forEach((el1) => {
     const origin = el1.getAttribute("data-origin");
@@ -173,6 +185,7 @@ loadLibrary();
 if (window.location.hash) scrollToUri(window.location.hash);
 window.onhashchange = () => scrollToUri(window.location.hash);
 
+initializeModules();
 initializeHovering(document);
 initializeTOC();
 initializeView();

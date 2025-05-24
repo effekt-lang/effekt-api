@@ -110,14 +110,14 @@ const dumpModule = (ctx) => (obj) => {
   obj.module.defs.forEach(dumpDefinition({ ...ctx, depth: ctx.depth + 1 }));
 };
 
-async function dumpAll(data, out, dumper) {
-  const dir = await fs.promises.opendir(data);
+async function dumpAll(dataDir, outDir, dumper) {
+  const dir = await fs.promises.opendir(dataDir);
 
   for await (const dirent of dir) {
     console.log(dirent.name);
-    fs.readFile(`${data}/${dirent.name}`, "utf8", (err, data) => {
+    fs.readFile(`${dataDir}/${dirent.name}`, "utf8", (err, data) => {
       const name = dirent.name.replace(/\..*$/, "");
-      const outName = `${out}/${name}.html`;
+      const outName = `${outDir}/${name}.html`;
       fs.writeFileSync(outName, ""); // create/clear
       const write = (text) => fs.appendFileSync(outName, text);
 
