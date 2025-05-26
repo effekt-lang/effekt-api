@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Effekt dependencies
-        uses: effekt-lang/effekt/.github/actions/setup-effekt
+        uses: effekt-lang/effekt/.github/actions/setup-effekt@master
         with:
           install-dependencies: 'true'
       - name: Checkout given commit
