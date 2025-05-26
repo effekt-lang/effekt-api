@@ -50,18 +50,19 @@ const showSignature = (ctx) => (term) => {
   let res = "";
 
   if ("tparams" in term && term.tparams.length > 0)
-    res += `\`[${term.tparams.map(ctx.id).join(", ")}]\``;
+    res += `[${term.tparams.map(ctx.id).join(", ")}]`;
 
   if ("vparams" in term && term.vparams.length > 0)
-    res += ` \`(${term.vparams.map(({ id, tpe }) => `${ctx.id(id)}: ${showType(ctx)(tpe)}`).join(", ")})\``;
+    res += ` (${term.vparams.map(({ id, tpe }) => `${ctx.id(id)}: ${showType(ctx)(tpe)}`).join(", ")})`;
 
   if ("bparams" in term && term.bparams.length > 0)
-    res += ` ${term.bparams.map(({ id, tpe }) => `\`{ ${ctx.id(id)}: ${showType(ctx)(tpe)} }\``).join(" ")}`;
+    res += ` ${term.bparams.map(({ id, tpe }) => `{ ${ctx.id(id)}: ${showType(ctx)(tpe)} }`).join(" ")}`;
 
   if ("ret" in term && term.ret.kind === "Effectful")
-    res += `: \`${showType(ctx)(term.ret.tpe)} / {${term.ret.eff.map(showType(ctx)).join(", ")}}\` `;
+    res += `: ${showType(ctx)(term.ret.tpe)} / {${term.ret.eff.map(showType(ctx)).join(", ")}} `;
 
-  return res;
+  if (res != "") return `\`${res}\``;
+  return "";
 };
 
 const dumpFields = (ctx) => (term) => {

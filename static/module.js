@@ -9,7 +9,7 @@ import {
 } from "./search.js";
 
 function jumpToModule(module) {
-  window.location.assign(`/${module}.html`);
+  window.location.assign(`${module}.html`);
 }
 
 // TODO: we could instead also just parse the originSource attribute (see jumpToGithubOrigin)
