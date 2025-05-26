@@ -150,7 +150,7 @@ export function searchOrigins(origin, name) {
 }
 
 export async function loadLibrary() {
-  const response = await fetch("/full.json.gz");
+  const response = await fetch("full.json.gz");
   if (!response.ok) throw new Error("Missing library");
 
   if (typeof DecompressionStream === "undefined")
