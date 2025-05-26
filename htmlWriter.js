@@ -1,3 +1,5 @@
+const { Writer } = require("./writer");
+
 // some sources contain the path to the node-installed library, so we need to extract only the relevant path!
 const stripSource = (source) =>
   source ? source.replace(/.*(libraries\/.*\.effekt)$/, "$1") : "";
@@ -39,77 +41,69 @@ const htmlify = (text) => {
   else return text.replace(/`([^`]+)`/g, '<code class="inline">$1</code>');
 };
 
-const htmlWriter = (write) => {
-  let currentDepth = -1;
-  return {
-    write,
-    heading: (depth, kind, text, signature, onlyToc) => {
-      if (onlyToc) return;
-      let out = "";
-      if (depth > currentDepth) out += "<ul class=subtree>";
-      if (depth < currentDepth) out += "</ul>".repeat(currentDepth - depth);
-      currentDepth = depth;
-      out += `<li class="heading ${kind}" title="${kind}">${text} <small class="signature">${htmlify(signature)}</small></li>`;
-      write(out);
-    },
-    url: (name, href) => write(`<a href="${href}">${name}</a>`),
-    addDoc: (doc) => {
-      if (doc.trim() != "")
-        write(
-          `<div class="markdownWrap"><pre class="markdown doc">${doc}</pre></div>`,
-        );
-    },
-    id: ({ name, source, origin }) => {
-      const sourceId = `${source.lineStart}:${source.columnStart}-${source.lineEnd}:${source.columnEnd}`;
-      // not every id has an origin!
-      const originId =
-        "lineStart" in origin
-          ? `${origin.lineStart}:${origin.columnStart}-${origin.lineEnd}:${origin.columnEnd}`
-          : "";
-      return `<span class="id" data-sourceSource="${stripSource(source.file)}" data-source="${sourceId}" data-originSource="${stripSource(origin.file)}" data-origin="${originId}">${name}</span>`;
-    },
-    depth: 1,
-    currentDepth: () => currentDepth,
-  };
-};
+// TODO: we should abstract away the shared depth logic from here and tocWriter
+class HtmlWriter extends Writer {
+  heading(depth, kind, text, signature, onlyToc) {
+    if (onlyToc) return;
+    let out = "";
+    if (depth > this.currentDepth()) out += "<ul class=subtree>";
+    if (depth < this.currentDepth())
+      out += "</ul>".repeat(this.currentDepth() - depth);
+    this._currentDepth.value = depth;
+    out += `<li class="heading ${kind}" title="${kind}">${text} <small class="signature">${htmlify(signature)}</small></li>`;
+    this.write(out);
+  }
+  url(name, href) {
+    this.write(`<a href="${href}">${name}</a>`);
+  }
+  addDoc(doc) {
+    if (doc.trim() != "")
+      this.write(
+        `<div class="markdownWrap"><pre class="markdown doc">${doc}</pre></div>`,
+      );
+  }
+  id({ name, source, origin }) {
+    const sourceId = `${source.lineStart}:${source.columnStart}-${source.lineEnd}:${source.columnEnd}`;
+    // not every id has an origin!
+    const originId =
+      "lineStart" in origin
+        ? `${origin.lineStart}:${origin.columnStart}-${origin.lineEnd}:${origin.columnEnd}`
+        : "";
+    return `<span class="id" data-sourceSource="${stripSource(source.file)}" data-source="${sourceId}" data-originSource="${stripSource(origin.file)}" data-origin="${originId}">${name}</span>`;
+  }
+}
 
-const htmlTocWriter = (write) => {
-  let currentDepth = -1;
-  return {
-    write: () => {},
-    heading: (depth, kind, text) => {
-      let out = "";
-      if (depth > currentDepth) out += "<ul class=subtree>";
-      if (depth < currentDepth) out += "</ul>".repeat(currentDepth - depth);
-      currentDepth = depth;
-      out += `<li class="heading ${kind}">${text}</li>`;
-      write(out);
-    },
-    url: () => {},
-    addDoc: () => {},
-    id: ({ name, source, origin }) => {
-      const sourceId = `${source.lineStart}:${source.columnStart}-${source.lineEnd}:${source.columnEnd}`;
-      // not every id has an origin!
-      const originId =
-        "lineStart" in origin
-          ? `${origin.lineStart}:${origin.columnStart}-${origin.lineEnd}:${origin.columnEnd}`
-          : "";
-      return `<span class="id" data-sourceSource="${stripSource(source.file)}" data-source="${sourceId}" data-originSource="${stripSource(origin.file) || ""}" data-origin="${originId}">${name}</span>`;
-    },
-    depth: 1,
-    currentDepth: () => currentDepth,
-  };
-};
+class HtmlTocWriter extends Writer {
+  write() {} // toc is only written by heading/id
+  heading(depth, kind, text) {
+    let out = "";
+    if (depth > this.currentDepth()) out += "<ul class=subtree>";
+    if (depth < this.currentDepth())
+      out += "</ul>".repeat(this.currentDepth() - depth);
+    this._currentDepth.value = depth;
+    out += `<li class="heading ${kind}">${text}</li>`;
+    this._write(out);
+  }
+  id({ name, source, origin }) {
+    const sourceId = `${source.lineStart}:${source.columnStart}-${source.lineEnd}:${source.columnEnd}`;
+    // not every id has an origin!
+    const originId =
+      "lineStart" in origin
+        ? `${origin.lineStart}:${origin.columnStart}-${origin.lineEnd}:${origin.columnEnd}`
+        : "";
+    return `<span class="id" data-sourceSource="${stripSource(source.file)}" data-source="${sourceId}" data-originSource="${stripSource(origin.file) || ""}" data-origin="${originId}">${name}</span>`;
+  }
+}
 
 const htmlDump = (write, dumpModule) => (docs) => {
   let toc = "";
-  const tocWriter = htmlTocWriter((text) => (toc += text));
+  const tocWriter = new HtmlTocWriter((text) => (toc += text));
   dumpModule(tocWriter)(docs);
   toc += "</ul>".repeat(tocWriter.currentDepth());
 
   let content = "";
   const template = htmlTemplate(toc);
-  const writer = htmlWriter((text) => (content += text));
+  const writer = new HtmlWriter((text) => (content += text));
   writer.write(template.start);
   dumpModule(writer)(docs);
   writer.write("</section>".repeat(writer.currentDepth()));
@@ -121,8 +115,8 @@ const htmlDump = (write, dumpModule) => (docs) => {
 const htmlDumpMultipleDispatch = (write, dumpModule) => {
   let toc = "";
   let content = "";
-  const tocWriter = htmlTocWriter((text) => (toc += text));
-  const writer = htmlWriter((text) => (content += text));
+  const tocWriter = new HtmlTocWriter((text) => (toc += text));
+  const writer = new HtmlWriter((text) => (content += text));
 
   const dispatch = (docs) => {
     // false value -> write!

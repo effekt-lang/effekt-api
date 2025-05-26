@@ -84,7 +84,7 @@ const dumpFields = (ctx) => (term) => {
 
 const dumpDefinitions = (ctx) => (term) => {
   if ("definitions" in term)
-    term.definitions.forEach(dumpDefinition({ ...ctx, depth: ctx.depth + 1 }));
+    term.definitions.forEach(dumpDefinition(ctx.updateDepth(ctx.depth + 1)));
 };
 
 const dumpDefinition = (ctx) => (term) => {
@@ -108,7 +108,7 @@ const dumpModule = (ctx) => (obj) => {
     `https://github.com/effekt-lang/effekt/tree/master/examples/stdlib/${obj.module.path}`,
   );
   dumpDoc(ctx)(obj.module.doc); // TODO
-  obj.module.defs.forEach(dumpDefinition({ ...ctx, depth: ctx.depth + 1 }));
+  obj.module.defs.forEach(dumpDefinition(ctx.updateDepth(ctx.depth + 1)));
 };
 
 async function dumpAll(dataDir, outDir, dumper) {
