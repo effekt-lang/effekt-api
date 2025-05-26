@@ -49,7 +49,7 @@ jobs:
       - name: Checkout most recent commit
         if: "${{ github.event.inputs.effekt_commit == '' }}"
         run: |
-          git -C effekt/ checkout master
+          git -C effekt/ checkout -b feature/documentation-generator
           git -C effekt/ pull
       - name: Install Effekt
         run: cd effekt/ && sbt install
