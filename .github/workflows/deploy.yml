@@ -26,10 +26,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Effekt dependencies
-        uses: effekt-lang/effekt/.github/actions/setup-effekt@master
+      - name: Set up NodeJS
+        uses: actions/setup-node@v4
         with:
-          install-dependencies: 'true'
+          node-version: 16
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          java-version: 11
+          distribution: 'zulu'
+          cache: 'sbt'
+      - name: Setup SBT
+        uses: sbt/setup-sbt@v1
+      - name: Setup dependencies
+        run: sudo apt-get install jq gzip
       - name: Checkout given commit
         if: "${{ github.event.inputs.effekt_commit != '' }}"
         run: |

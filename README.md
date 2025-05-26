@@ -1,6 +1,6 @@
 # Effekt Library Documentation
 
-## instructions
+## Instructions
 
 -   Install `effekt`, `jq`, `gzip`, `nodejs`
 -   `./gen.sh html`
