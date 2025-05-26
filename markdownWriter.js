@@ -1,3 +1,5 @@
+const { Writer } = require("./writer");
+
 const markdownTemplate = {
   start: `---
 title: Effekt Documentation
@@ -16,18 +18,23 @@ header-includes: |
 };
 
 // TODO: this is not synced/tested right now
-const markdownWriter = (write) => ({
-  write: write,
-  heading: (depth, kind, text) =>
-    write(`${"#".repeat(depth)} ${text} (${kind})\n`),
-  url: (name, href) => write(`[${name}](${href})`),
-  addDoc: (doc) => write(`${doc}\n`),
-  id: (id) => id.name,
-  depth: 1,
-});
+class MarkdownWriter extends Writer {
+  heading(depth, kind, text) {
+    this.write(`${"#".repeat(depth)} ${text} (${kind})\n`);
+  }
+  url(name, href) {
+    this.write(`[${name}](${href})`);
+  }
+  addDoc(doc) {
+    this.write(`${doc}\n`);
+  }
+  id({ name }) {
+    return name;
+  }
+}
 
 const markdownDump = (write, dumpModule) => (docs) => {
-  const writer = markdownWriter(write);
+  const writer = new MarkdownWriter(write);
   writer.write(markdownTemplate.start);
   dumpModule(writer)(docs);
   writer.write(markdownTemplate.end);
