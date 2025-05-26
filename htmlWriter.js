@@ -101,7 +101,7 @@ const htmlTocWriter = (write) => {
   };
 };
 
-export const htmlDump = (write, dumpModule) => (docs) => {
+const htmlDump = (write, dumpModule) => (docs) => {
   let toc = "";
   const tocWriter = htmlTocWriter((text) => (toc += text));
   dumpModule(tocWriter)(docs);
@@ -118,7 +118,7 @@ export const htmlDump = (write, dumpModule) => (docs) => {
 };
 
 // allows dumping multiple docs objs into a single template
-export const htmlDumpMultipleDispatch = (write, dumpModule) => {
+const htmlDumpMultipleDispatch = (write, dumpModule) => {
   let toc = "";
   let content = "";
   const tocWriter = htmlTocWriter((text) => (toc += text));
@@ -148,3 +148,5 @@ export const htmlDumpMultipleDispatch = (write, dumpModule) => {
 
   return dispatch;
 };
+
+module.exports = { htmlDump, htmlDumpMultipleDispatch };
