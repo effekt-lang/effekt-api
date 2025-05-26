@@ -28,19 +28,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
-      - name: Set up NodeJS
-        uses: actions/setup-node@v4
-        with:
-          node-version: 16
-      - name: Set up JDK 11
-        uses: actions/setup-java@v4
-        with:
-          java-version: 11
-          distribution: 'zulu'
-          cache: 'sbt'
-      - name: Setup SBT
-        uses: sbt/setup-sbt@v1
-      - name: Setup dependencies
+      - name: Install Effekt dependencies
+        uses: effekt-lang/effekt/.github/actions/setup-effekt@master
+      - name: Install other dependencies
         run: sudo apt-get install jq gzip
       - name: Checkout given commit
         if: "${{ github.event.inputs.effekt_commit != '' }}"
@@ -49,7 +39,7 @@ jobs:
       - name: Checkout most recent commit
         if: "${{ github.event.inputs.effekt_commit == '' }}"
         run: |
-          git -C effekt/ checkout -b feature/documentation-generator
+          git -C effekt/ checkout master
           git -C effekt/ pull
       - name: Install Effekt
         run: cd effekt/ && sbt install
