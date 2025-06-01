@@ -35,6 +35,7 @@ jobs:
       - name: Checkout given commit
         if: "${{ github.event.inputs.effekt_commit != '' }}"
         run: |
+          git -C effekt/ fetch --all
           git -C effekt/ checkout ${{ github.event.inputs.effekt_commit }}
       - name: Checkout most recent commit
         if: "${{ github.event.inputs.effekt_commit == '' }}"
