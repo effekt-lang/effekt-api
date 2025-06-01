@@ -1,4 +1,4 @@
-class Writer {
+export class Writer {
   constructor(write) {
     this._write = write;
     this._currentDepth = { value: -1 };
@@ -36,5 +36,3 @@ class Writer {
     return copy;
   }
 }
-
-module.exports = { Writer };

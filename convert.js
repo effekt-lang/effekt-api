@@ -2,10 +2,10 @@
 /// it to Effekt code. `ctx` resembles an interface, where its functions are
 /// effects that write the documentation (e.g. using htmlWriter)
 
-const fs = require("node:fs");
-const { htmlDump } = require("./htmlWriter");
-const { markdownDump } = require("./markdownWriter");
-const { stripSource, moduleFile, moduleDir } = require("./common");
+import fs from "node:fs";
+import { htmlDump } from "./htmlWriter.js";
+import { markdownDump } from "./markdownWriter.js";
+import { stripSource, moduleFile, moduleDir } from "./common.js";
 
 const TARGET = process.argv[2];
 
@@ -118,8 +118,8 @@ async function dumpAll(dataDir, outDir, dumper) {
     console.log(dirent.name);
     fs.readFile(`${dataDir}/${dirent.name}`, "utf8", (err, data) => {
       const docs = JSON.parse(data);
-      const file = moduleFile(docs);
-      const dir = moduleDir(docs);
+      const file = moduleFile(docs.source);
+      const dir = moduleDir(docs.source);
 
       fs.mkdirSync(`${outDir}/${dir}`, { recursive: true });
       const outName = `${outDir}/${file}.${TARGET}`;

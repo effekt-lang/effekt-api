@@ -1,4 +1,5 @@
 import { constructPosId, deconstructPosId } from "./util.js";
+import { ROOT_PATH, moduleFile } from "./common.js";
 
 let entireLibrary = [];
 
@@ -127,13 +128,11 @@ export function searchDefinition(toc, input) {
       const mod = value.module.obj;
       return `
       <li class="heading Module">
-        <span class="id" data-sourcesource="${mod.span.file}" data-source="${constructPosId(mod.span)}" data-originsource="${mod.span.file}" data-origin="${constructPosId(mod.span)}">
-          ${mod.path}
-        </span>
-        <ul class="subtree">
-          ${resultHTML}
-        </ul>
-      </li>`;
+        <a class="moduleLink" href="${ROOT_PATH}/${moduleFile(mod.span.file)}.html">${mod.path}</a>
+      </li>
+      <ul class="subtree">
+        ${resultHTML}
+      </ul>`;
     })
     .join("");
 
@@ -150,7 +149,7 @@ export function searchOrigins(origin, name) {
 }
 
 export async function loadLibrary() {
-  const response = await fetch("full.json.gz");
+  const response = await fetch(`${ROOT_PATH}/full.json.gz`);
   if (!response.ok) throw new Error("Missing library");
 
   if (typeof DecompressionStream === "undefined")

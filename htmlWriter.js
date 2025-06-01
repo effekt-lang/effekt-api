@@ -1,5 +1,5 @@
-const { ROOT_PATH } = require("./common");
-const { Writer } = require("./writer");
+import { ROOT_PATH } from "./common.js";
+import { Writer } from "./writer.js";
 
 // some sources contain the path to the node-installed library, so we need to extract only the relevant path!
 const stripSource = (source) =>
@@ -27,7 +27,7 @@ const htmlTemplate = (toc) => ({
         <input class="search" type="search" spellcheck=false placeholder="Search" id="search"></input>
       </li>
       ${toc}
-      <li class="searchResults"></li>
+      <div class="searchResults"></div>
     </ul>
     <ul class="view tree">
   `,
@@ -98,7 +98,7 @@ class HtmlTocWriter extends Writer {
   }
 }
 
-const htmlDump = (write, dumpModule) => (docs) => {
+export const htmlDump = (write, dumpModule) => (docs) => {
   let toc = "";
   const tocWriter = new HtmlTocWriter((text) => (toc += text));
   dumpModule(tocWriter)(docs);
@@ -115,7 +115,7 @@ const htmlDump = (write, dumpModule) => (docs) => {
 };
 
 // allows dumping multiple docs objs into a single template
-const htmlDumpMultipleDispatch = (write, dumpModule) => {
+export const htmlDumpMultipleDispatch = (write, dumpModule) => {
   let toc = "";
   let content = "";
   const tocWriter = new HtmlTocWriter((text) => (toc += text));
@@ -145,5 +145,3 @@ const htmlDumpMultipleDispatch = (write, dumpModule) => {
 
   return dispatch;
 };
-
-module.exports = { htmlDump, htmlDumpMultipleDispatch };

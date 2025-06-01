@@ -14,5 +14,5 @@ node index.js "$1" >build/index."$1"
 # we copy the static files into *every* subdirectory
 # this is a hack, but makes importing files a lot simpler!
 for dir in $(find build -type d); do
-	cp static/* "$dir"
+	cp common.js static/* "$dir"
 done

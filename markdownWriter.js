@@ -1,4 +1,4 @@
-const { Writer } = require("./writer");
+import { Writer } from "./writer.js";
 
 const markdownTemplate = {
   start: `---
@@ -33,11 +33,9 @@ class MarkdownWriter extends Writer {
   }
 }
 
-const markdownDump = (write, dumpModule) => (docs) => {
+export const markdownDump = (write, dumpModule) => (docs) => {
   const writer = new MarkdownWriter(write);
   writer.write(markdownTemplate.start);
   dumpModule(writer)(docs);
   writer.write(markdownTemplate.end);
 };
-
-module.exports = { markdownDump };

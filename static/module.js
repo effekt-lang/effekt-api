@@ -7,12 +7,9 @@ import {
   searchOrigins,
   loadLibrary,
 } from "./search.js";
+import { ROOT_PATH, moduleFile } from "./common.js";
 
 const tocToggle = window.tocToggle;
-
-function jumpToModule(module) {
-  window.location.assign(`${module}.html`);
-}
 
 // TODO: we could instead also just parse the originSource attribute (see jumpToGithubOrigin)
 function jumpToOrigin(definition, newTab) {
@@ -20,7 +17,7 @@ function jumpToOrigin(definition, newTab) {
   const { lineStart, columnStart, lineEnd, columnEnd } =
     definition.obj.id.origin;
   const name = `${definition.obj.id.name}@${lineStart}:${columnStart}-${lineEnd}:${columnEnd}`;
-  const url = `${mod.obj.path}.html#${name}`;
+  const url = `${ROOT_PATH}/${moduleFile(mod.obj.span.file)}.html#${name}`;
   if (newTab) window.open(url, "_blank").focus();
   else {
     window.location.assign(url);
@@ -108,8 +105,7 @@ function lookupPopupAt(ev, element) {
 }
 
 function initializeModules() {
-  document.querySelectorAll(".heading.Module").forEach((el) => {
-    el.addEventListener("click", async (ev) => jumpToModule(el.innerText));
+  document.querySelectorAll("a.moduleLink").forEach((el) => {
     el.addEventListener("mouseenter", () => el.classList.add("highlight"));
     el.addEventListener("mouseout", () => el.classList.remove("highlight"));
   });
@@ -169,6 +165,7 @@ function initializeSearch() {
   searchBar.addEventListener("input", () => {
     const toc = document.querySelector(".toc.tree");
     searchDefinition(toc, searchBar.value.toLowerCase());
+    initializeModules();
     initializeHovering(toc);
     initializeTOC();
   });

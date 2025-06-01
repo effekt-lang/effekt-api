@@ -1,14 +1,15 @@
-// generate an index.html with all modules
+// generate an index.html with all modules, grouped by their subdirectories
 
-const fs = require("node:fs");
-const { htmlDumpMultipleDispatch } = require("./htmlWriter");
-const { moduleFile, stripSource } = require("./common");
+import fs from "node:fs";
+import { htmlDumpMultipleDispatch } from "./htmlWriter.js";
+import { moduleFile, moduleDir, stripSource } from "./common.js";
 
+// note: we could easily render the *entire* library on / as well
 const dumpModule = (ctx) => (obj) => {
   ctx.heading(
     ctx.depth,
     "Module",
-    `<a href="${moduleFile(obj)}.html">${obj.module.path}</a>`,
+    `<a class="moduleLink" href="${moduleFile(obj.source)}.html">${obj.module.path}</a>`,
     "",
     true,
   );
@@ -21,11 +22,21 @@ function dumpAll(dataDir, dumper) {
   let dirent;
   while ((dirent = dir.readSync()) !== null) dirents.push(dirent.name);
 
+  const commonDirs = {};
   dirents.sort().forEach((dirent) => {
     const data = fs.readFileSync(`${dataDir}/${dirent}`, "utf8");
     const docs = JSON.parse(data);
-    dumper = dumper(docs);
+    const dir = moduleDir(docs.source);
+
+    if (dir in commonDirs) commonDirs[dir].push(docs);
+    else commonDirs[dir] = [docs];
   });
+
+  for (const dir in commonDirs) {
+    for (const obj of commonDirs[dir]) {
+      dumper = dumper(obj);
+    }
+  }
 
   dumper(null);
 }
