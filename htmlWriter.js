@@ -15,6 +15,7 @@ const htmlTemplate = (toc) => ({
   </meta>
   <body>
     <main>
+    <button id="tocToggle">≡</button>
     <ul class="toc tree">
       <li class="header">
         <div class="brand">

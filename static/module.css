@@ -44,7 +44,6 @@ main {
 .view .subtree {
   padding-inline-start: 0em;
   max-width: 100%;
-  overflow-x: hidden;
 }
 
 /* for all subtrees within module */
@@ -71,6 +70,20 @@ main {
   width: 100%;
   background-color: white;
   margin: 0;
+}
+
+button#tocToggle {
+  display: none;
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  font-size: 32px;
+  width: 50px;
+  height: 50px;
+  border-radius: 100%;
+  border: none;
+  background-color: #ddd;
+  cursor: pointer;
 }
 
 /* --- logo --- */
@@ -140,6 +153,19 @@ main {
 @media only screen and (max-width: 600px) {
   .toc {
     display: none;
+  }
+  .toc, .toc.tree {
+    width: calc(100vw - 32px);
+  }
+  button#tocToggle {
+    display: block;
+  }
+}
+
+@media only screen and (min-width: 600px) {
+  /* in the case of growing windows with explicitely hidden toc */
+  .toc {
+    display: unset !important;
   }
 }
 

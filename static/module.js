@@ -8,6 +8,8 @@ import {
   loadLibrary,
 } from "./search.js";
 
+const tocToggle = window.tocToggle;
+
 function jumpToModule(module) {
   window.location.assign(`${module}.html`);
 }
@@ -151,6 +153,7 @@ function initializeView() {
 function initializeTOC() {
   document.querySelectorAll(".toc.tree span.id").forEach((el) => {
     el.addEventListener("click", () => {
+      tocToggle.click();
       const origins = searchOrigins(
         el.getAttribute("data-origin"),
         el.innerText,
@@ -193,3 +196,9 @@ initializeSearch();
 initializeMarkdown();
 
 document.body.addEventListener("click", clearPopups, true);
+
+const toc = document.querySelector(".toc.tree");
+tocToggle.addEventListener("click", () => {
+  if (tocToggle.offsetParent === null) return;
+  toc.style.display = toc.offsetParent === null ? "block" : "none";
+});
