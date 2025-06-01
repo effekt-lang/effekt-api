@@ -5,6 +5,9 @@
 const fs = require("node:fs");
 const { htmlDump } = require("./htmlWriter");
 const { markdownDump } = require("./markdownWriter");
+const { stripSource, moduleFile, moduleDir } = require("./common");
+
+const TARGET = process.argv[2];
 
 const sanitizeDoc = (doc) => {
   return doc
@@ -15,9 +18,6 @@ const sanitizeDoc = (doc) => {
     })
     .join("\n");
 };
-
-const stripSource = (source) =>
-  source.replace(/.*(libraries\/.*\.effekt)$/, "$1");
 
 const dumpDoc = (ctx) => (doc) => ctx.addDoc(sanitizeDoc(doc) ?? "");
 
@@ -117,16 +117,19 @@ async function dumpAll(dataDir, outDir, dumper) {
   for await (const dirent of dir) {
     console.log(dirent.name);
     fs.readFile(`${dataDir}/${dirent.name}`, "utf8", (err, data) => {
-      const name = dirent.name.replace(/\..*$/, "");
-      const outName = `${outDir}/${name}.html`;
-      fs.writeFileSync(outName, ""); // create/clear
-      const write = (text) => fs.appendFileSync(outName, text);
-
       const docs = JSON.parse(data);
+      const file = moduleFile(docs);
+      const dir = moduleDir(docs);
+
+      fs.mkdirSync(`${outDir}/${dir}`, { recursive: true });
+      const outName = `${outDir}/${file}.${TARGET}`;
+      fs.writeFileSync(outName, ""); // create/clear
+
+      const write = (text) => fs.appendFileSync(outName, text);
       dumper(write, dumpModule)(docs);
     });
   }
 }
 
-const dumper = process.argv[2] === "html" ? htmlDump : markdownDump;
+const dumper = TARGET === "html" ? htmlDump : markdownDump;
 dumpAll("out", "build", dumper).catch(console.error);

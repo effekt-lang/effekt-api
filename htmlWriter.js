@@ -1,3 +1,4 @@
+const { ROOT_PATH } = require("./common");
 const { Writer } = require("./writer");
 
 // some sources contain the path to the node-installed library, so we need to extract only the relevant path!
@@ -18,9 +19,10 @@ const htmlTemplate = (toc) => ({
     <button id="tocToggle">≡</button>
     <ul class="toc tree">
       <li class="header">
-        <div class="brand">
+        <a class="brand" href="${ROOT_PATH}">
           <img src="https://effekt-lang.org/img/light-navbar-brand.svg" alt="Effekt Logo" />
           <span>Effekt Library</span>
+        </a>
         </div>
         <input class="search" type="search" spellcheck=false placeholder="Search" id="search"></input>
       </li>

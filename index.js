@@ -2,12 +2,13 @@
 
 const fs = require("node:fs");
 const { htmlDumpMultipleDispatch } = require("./htmlWriter");
+const { moduleFile, stripSource } = require("./common");
 
 const dumpModule = (ctx) => (obj) => {
   ctx.heading(
     ctx.depth,
     "Module",
-    `<a href="${obj.module.path}.html">${obj.module.path}</a>`,
+    `<a href="${moduleFile(obj)}.html">${obj.module.path}</a>`,
     "",
     true,
   );

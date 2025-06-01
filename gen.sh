@@ -8,6 +8,11 @@ effekt.sh -o out/ --write-documentation $(find effekt/libraries/ -type f -name "
 cat out/*.json | jq -c -s . >build/full.json
 gzip build/full.json
 
-cp static/* build/
 node convert.js "$1"
 node index.js "$1" >build/index."$1"
+
+# we copy the static files into *every* subdirectory
+# this is a hack, but makes importing files a lot simpler!
+for dir in $(find build -type d); do
+	cp static/* "$dir"
+done
