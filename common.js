@@ -1,4 +1,4 @@
-export const ROOT_PATH = "/effect-api";
+export const ROOT_PATH = "/effekt-api";
 // export const ROOT_PATH = "/.";
 
 export const stripSource = (source) =>
