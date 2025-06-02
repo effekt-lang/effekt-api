@@ -19,7 +19,7 @@ const htmlTemplate = (toc) => ({
     <button id="tocToggle">≡</button>
     <ul class="toc tree">
       <li class="header">
-        <a class="brand" href="${ROOT_PATH}">
+        <a class="brand" href="${ROOT_PATH}/index.html">
           <img src="https://effekt-lang.org/img/light-navbar-brand.svg" alt="Effekt Logo" />
           <span>Effekt Library</span>
         </a>
