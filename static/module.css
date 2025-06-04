@@ -1,3 +1,9 @@
+:root {
+  --sidebar: 200px;
+  --padding: 16px;
+  --borders: 3px;
+}
+
 html, body, main {
   padding: 0;
   margin: 0;
@@ -19,7 +25,7 @@ main {
 }
 
 .view {
-  width: calc(100% - 32px);
+  width: calc(100% - var(--padding) * 2);
 }
 
 /* --- tree --- */
@@ -28,13 +34,13 @@ main {
   min-height: 100%;
   overflow-y: scroll;
   list-style-type: none;
-  padding: 0 16px;
+  padding: 0 var(--padding);
   margin: 0;
 }
 
 .toc.tree {
-  border-right: 3px solid #ddd;
-  width: 200px;
+  border-right: var(--borders) solid #ddd;
+  width: var(--sidebar);
 }
 
 .toc .subtree {
@@ -48,7 +54,7 @@ main {
 
 /* for all subtrees within module */
 .view .subtree > .subtree > .subtree {
-  border-left: 3px solid #ddd;
+  border-left: var(--borders) solid #ddd;
   margin-left: .85em;
   padding-left: .5em;
 }
@@ -67,9 +73,10 @@ main {
 .tree li.header {
   position: sticky;
   top: 0;
-  width: 100%;
+  width: calc(var(--sidebar) + var(--padding) * 2);
   background-color: white;
   margin: 0;
+  margin-left: calc(-1 * var(--padding));
 }
 
 button#tocToggle {
@@ -90,7 +97,7 @@ button#tocToggle {
 
 .tree li.header .brand {
   display: flex;
-  padding: 16px 0;
+  padding: var(--padding) 0;
   align-items: center;
   justify-content: center;
 }
@@ -110,7 +117,7 @@ button#tocToggle {
   display: block;
   padding: 8px;
   border-radius: 10px;
-  width: 100%;
+  width: var(--sidebar);
   margin: 0 auto;
 }
 
@@ -118,7 +125,7 @@ button#tocToggle {
 
 .markdownWrap {
   max-width: 100%;
-  border-left: 3px solid #ddd;
+  border-left: var(--borders) solid #ddd;
   margin-left: .85em;
   padding-left: .85em;
 }
@@ -139,7 +146,7 @@ button#tocToggle {
 	background-color: white;
 	padding: 8px;
 	max-width: 300px;
-  border: 3px solid #ddd;
+  border: var(--borders) solid #ddd;
   border-radius: 10px;
 }
 
@@ -151,11 +158,15 @@ button#tocToggle {
 /* --- responsiveness --- */
 
 @media only screen and (max-width: 600px) {
+  :root {
+    --sidebar: calc(100% - var(--padding));
+  }
+
   .toc {
     display: none;
   }
   .toc, .toc.tree {
-    width: calc(100vw - 32px);
+    width: calc(100vw - var(--padding));
   }
   button#tocToggle {
     display: block;
