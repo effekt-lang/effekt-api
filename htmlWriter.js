@@ -9,11 +9,11 @@ const stripSource = (source) =>
 const htmlTemplate = (toc) => ({
   start: `<!DOCTYPE html>
   <html>
-  <meta>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="stylesheet" href="module.css" type="text/css" charset="utf-8" />
-  </meta>
+  </head>
   <body>
     <main>
     <button id="tocToggle">≡</button>
@@ -23,7 +23,6 @@ const htmlTemplate = (toc) => ({
           <img src="https://effekt-lang.org/img/light-navbar-brand.svg" alt="Effekt Logo" />
           <span>Effekt Library</span>
         </a>
-        </div>
         <input class="search" type="search" spellcheck=false placeholder="Search" id="search"></input>
       </li>
       ${toc}

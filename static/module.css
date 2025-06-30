@@ -59,6 +59,10 @@ main {
   padding-left: .5em;
 }
 
+.view .heading {
+  margin-top: 14px !important;
+}
+
 .tree li {
   list-style-type: none;
   margin: 8px 0;
