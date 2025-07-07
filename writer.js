@@ -7,7 +7,7 @@ export class Writer {
 
   /// abstract
 
-  heading(depth, kind, text, onlyToc) {}
+  heading(depth, kind, text, onlyToc, inPrelude) {}
 
   url(name, href) {}
 

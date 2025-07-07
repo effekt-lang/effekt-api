@@ -8,6 +8,7 @@ import { markdownDump } from "./markdownWriter.js";
 import { stripSource, moduleFile, moduleDir } from "./common.js";
 
 const TARGET = process.argv[2];
+const PRELUDE = process.argv[3].split(",");
 
 const sanitizeDoc = (doc) => {
   return doc
@@ -73,6 +74,8 @@ const dumpFields = (ctx) => (term) => {
         field.kind,
         ctx.id(field.id),
         showSignature(ctx)(field),
+        false,
+        false,
       );
       dumpDoc(ctx)(field.doc);
     });
@@ -88,7 +91,14 @@ const dumpDefinitions = (ctx) => (term) => {
 };
 
 const dumpDefinition = (ctx) => (term) => {
-  ctx.heading(ctx.depth, term.kind, ctx.id(term.id), showSignature(ctx)(term));
+  ctx.heading(
+    ctx.depth,
+    term.kind,
+    ctx.id(term.id),
+    showSignature(ctx)(term),
+    false,
+    false,
+  );
   dumpDoc(ctx)(term.doc);
   dumpDefinitions(ctx)(term);
   dumpFields(ctx)(term);
@@ -96,7 +106,14 @@ const dumpDefinition = (ctx) => (term) => {
 
 const dumpModule = (ctx) => (obj) => {
   console.assert(obj.module.kind === "ModuleDecl");
-  ctx.heading(ctx.depth, "Module", obj.module.path);
+  ctx.heading(
+    ctx.depth,
+    "Module",
+    obj.module.path,
+    "",
+    false,
+    PRELUDE.includes(obj.module.path),
+  );
   ctx.write("Jump to source: ");
   ctx.url(
     stripSource(obj.source),

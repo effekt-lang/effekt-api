@@ -4,6 +4,9 @@ import fs from "node:fs";
 import { htmlDumpMultipleDispatch } from "./htmlWriter.js";
 import { moduleFile, moduleDir, stripSource } from "./common.js";
 
+const TARGET = process.argv[2];
+const PRELUDE = process.argv[3].split(",");
+
 // note: we could easily render the *entire* library on / as well
 const dumpModule = (ctx) => (obj) => {
   ctx.heading(
@@ -12,6 +15,7 @@ const dumpModule = (ctx) => (obj) => {
     `<a class="moduleLink" href="${moduleFile(obj.source)}.html">${obj.module.path}</a>`,
     "",
     true,
+    PRELUDE.includes(obj.module.path),
   );
 };
 

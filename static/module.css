@@ -206,10 +206,15 @@ button#tocToggle {
 .view .Module {
   font-size: 2em;
 }
-.toc .Module::before {
+.toc .Module[data-prelude=false]::before {
   content: "M";
   color: white;
   background-color: #542e5a;
+}
+.toc .Module[data-prelude=true]::before {
+  content: "P";
+  color: white;
+  background-color: #356c00;
 }
 .view .Module::before {
   content: "Module: ";

@@ -45,14 +45,14 @@ const htmlify = (text) => {
 
 // TODO: we should abstract away the shared depth logic from here and tocWriter
 class HtmlWriter extends Writer {
-  heading(depth, kind, text, signature, onlyToc) {
+  heading(depth, kind, text, signature, onlyToc, inPrelude) {
     if (onlyToc) return;
     let out = "";
     if (depth > this.currentDepth()) out += "<ul class=subtree>";
     if (depth < this.currentDepth())
       out += "</ul>".repeat(this.currentDepth() - depth);
     this._currentDepth.value = depth;
-    out += `<li class="heading ${kind}" title="${kind}">${text} <small class="signature">${htmlify(signature)}</small></li>`;
+    out += `<li class="heading ${kind}" data-prelude=${inPrelude} title="${kind}">${text} <small class="signature">${htmlify(signature)}</small></li>`;
     this.write(out);
   }
   url(name, href) {
@@ -77,13 +77,13 @@ class HtmlWriter extends Writer {
 
 class HtmlTocWriter extends Writer {
   write() {} // toc is only written by heading/id
-  heading(depth, kind, text) {
+  heading(depth, kind, text, signature, onlyToc, inPrelude) {
     let out = "";
     if (depth > this.currentDepth()) out += "<ul class=subtree>";
     if (depth < this.currentDepth())
       out += "</ul>".repeat(this.currentDepth() - depth);
     this._currentDepth.value = depth;
-    out += `<li class="heading ${kind}">${text}</li>`;
+    out += `<li class="heading ${kind}" data-prelude=${inPrelude}>${text}</li>`;
     this._write(out);
   }
   id({ name, source, origin }) {

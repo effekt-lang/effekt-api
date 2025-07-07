@@ -2,14 +2,16 @@
 set -e
 
 mkdir -p build/ out/
-rm -f out/* build/*
+rm -rf out/* build/*
 
-effekt.sh -o out/ --write-documentation $(find effekt/libraries/ -type f -name "*.effekt")
+prelude=$(effekt --show-prelude)
+
+effekt -o out/ --write-documentation $(find effekt/libraries/ -type f -name "*.effekt")
 cat out/*.json | jq -c -s . >build/full.json
 gzip build/full.json
 
-node convert.js "$1"
-node index.js "$1" >build/index."$1"
+node convert.js "$1" "$prelude"
+node index.js "$1" "$prelude" >build/index."$1"
 
 # we copy the static files into *every* subdirectory
 # this is a hack, but makes importing files a lot simpler!
