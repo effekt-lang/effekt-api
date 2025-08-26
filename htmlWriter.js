@@ -23,7 +23,7 @@ const htmlTemplate = (toc) => ({
           <img src="https://effekt-lang.org/img/light-navbar-brand.svg" alt="Effekt Logo" />
           <span>Effekt Library</span>
         </a>
-        <input class="search" type="search" spellcheck=false placeholder="Search" id="search"></input>
+        <input class="search" type="search" spellcheck=false placeholder="Search (Ctrl-K)" id="search"></input>
       </li>
       ${toc}
       <div class="searchResults"></div>

@@ -179,6 +179,16 @@ function initializeMarkdown() {
   });
 }
 
+function initializeShortcuts() {
+  document.addEventListener("keydown", function (event) {
+    // if Ctrl+K
+    if (event.ctrlKey && event.key.toLowerCase() === "k") {
+      event.preventDefault();
+      document.getElementById("search").focus();
+    }
+  });
+}
+
 // TODO: should we always do this?
 loadLibrary();
 
@@ -191,6 +201,7 @@ initializeTOC();
 initializeView();
 initializeSearch();
 initializeMarkdown();
+initializeShortcuts();
 
 document.body.addEventListener("click", clearPopups, true);
 
