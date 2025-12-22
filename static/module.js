@@ -33,7 +33,7 @@ function jumpToGithubOrigin(el, newTab) {
     return;
   }
   const { lineStart, lineEnd } = deconstructPosId(origin);
-  const url = `https://github.com/effekt-lang/effekt/blob/master/${originSource}#L${lineStart}-L${lineEnd}`;
+  const url = `https://github.com/effekt-lang/effekt/blob/main/${originSource}#L${lineStart}-L${lineEnd}`;
   openUrl(url, newTab);
 }
 
@@ -45,7 +45,7 @@ function jumpToGithubSource(el, newTab) {
     return;
   }
   const { lineStart, lineEnd } = deconstructPosId(source);
-  const url = `https://github.com/effekt-lang/effekt/blob/master/${sourceSource}#L${lineStart}-L${lineEnd}`;
+  const url = `https://github.com/effekt-lang/effekt/blob/main/${sourceSource}#L${lineStart}-L${lineEnd}`;
   openUrl(url, newTab);
 }
 

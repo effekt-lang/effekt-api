@@ -117,12 +117,12 @@ const dumpModule = (ctx) => (obj) => {
   ctx.write("Jump to source: ");
   ctx.url(
     stripSource(obj.source),
-    `https://github.com/effekt-lang/effekt/tree/master/${stripSource(obj.source)}`,
+    `https://github.com/effekt-lang/effekt/tree/main/${stripSource(obj.source)}`,
   );
   ctx.write("<br>Example usage: ");
   ctx.url(
     `examples/stdlib/${obj.module.path}`,
-    `https://github.com/effekt-lang/effekt/tree/master/examples/stdlib/${obj.module.path}`,
+    `https://github.com/effekt-lang/effekt/tree/main/examples/stdlib/${obj.module.path}`,
   );
   dumpDoc(ctx)(obj.module.doc); // TODO
   obj.module.defs.forEach(dumpDefinition(ctx.updateDepth(ctx.depth + 1)));
